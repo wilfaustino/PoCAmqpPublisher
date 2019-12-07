@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const app = express()
 const amqp = require('amqplib')
 
-const RABBIT_DEFAULT_URL = 'amqp://127.0.0.1'
+const RABBIT_DEFAULT_URL = 'amqp://0.0.0.0'
 const DEFAULT_PORT = 4000
 
 app.use(bodyParser.json())
