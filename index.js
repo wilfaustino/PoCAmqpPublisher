@@ -3,8 +3,19 @@ const bodyParser = require('body-parser')
 const app = express()
 const amqp = require('amqplib')
 
-const RABBIT_DEFAULT_URL = 'amqp://0.0.0.0'
 const DEFAULT_PORT = 4000
+
+const hostname = '0.0.0.0'
+const port = 5672
+let rabbitAddress = { hostname, port }
+
+if (process.env.RABBIT_PORT) {
+    rabbitAddress = {...rabbitAddress, port: process.env.RABBIT_PORT }
+}
+
+if (process.env.RABBIT_HOST) {
+    rabbitAddress = {...rabbitAddress, hostname: process.env.RABBIT_HOST }
+}
 
 app.use(bodyParser.json())
 
@@ -16,8 +27,8 @@ app.post('/:queue/', function (req, res) {
     const { body } = req
     const { queue } = req.params
     console.log('called' , { queue, body })
-
-    const open = amqp.connect(process.env.RABBIT_URL || RABBIT_DEFAULT_URL)
+    
+    const open = amqp.connect(rabbitAddress)
     open.then(conn => {
         return conn.createChannel()
     })
@@ -25,6 +36,9 @@ app.post('/:queue/', function (req, res) {
         return ch.assertQueue(queue)
             .then(() => {
                 return ch.sendToQueue(queue, Buffer.from(JSON.stringify(body)))
+            })
+            .then(() => {
+                return ch.close()
             })
     })
     .then(() => {
