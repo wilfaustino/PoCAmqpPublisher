@@ -5,7 +5,7 @@ const amqp = require('amqplib')
 
 const DEFAULT_PORT = 4000
 
-const hostname = '0.0.0.0'
+const hostname = '192.168.0.8'
 const port = 5672
 let rabbitAddress = { hostname, port }
 
